@@ -9,6 +9,7 @@ import nipype.interfaces.niftyseg as niftyseg
 from nipype.workflows.smri.niftyreg.groupwise import create_groupwise_average as create_atlas
 
 from .centroid_computation import centroid_computation
+from .atlas_computation import atlas_computation
 
 from ...interfaces.niftk.io import Image2VtkMesh
 from ...interfaces.shapeAnalysis import (VTKPolyDataReader, decimateVTKfile, CreateStructureOfData, WriteXMLFiles,
@@ -465,7 +466,18 @@ def create_preprocessing_shape_analysis(labels,
                                               reduction_rate,
                                               rigid_iteration=1,
                                               affine_iteration=2,
-                                              scan_number=2,
+                                              dkw=10,
+                                              dkt='Exact',
+                                              okw=[8],
+                                              dtp=30,
+                                              dsk=0.5,
+                                              dcps=5,
+                                              dcpp='x',
+                                              dfcp='Off',
+                                              dmi=200,
+                                              dat=0.00005,
+                                              dls=20,
+                                              ods=[0.5],
                                               name='spatio_temporal_analysis'
                                               ):
     # Create the workflow
@@ -477,7 +489,8 @@ def create_preprocessing_shape_analysis(labels,
         fields=['input_images',
                 'input_ref',
                 'input_seg',
-                'subject_ids']),
+                'subject_ids'
+                ]),
         name='input_node')
 
     # Create the output node
@@ -503,6 +516,21 @@ def create_preprocessing_shape_analysis(labels,
     workflow.connect(meshes_workflow, 'output_node.output_meshes',
                      output_node, 'extracted_meshes')
 
+    template_computation = atlas_computation(dkw=dkw,
+                                              dkt=dkt,
+                                              okw=okw,
+                                              dtp=dtp,
+                                              dsk=dsk,
+                                              dcps=dcps,
+                                              dcpp=dcpp,
+                                              dfcp=dfcp,
+                                              dmi=dmi,
+                                              dat=dat,
+                                              dls=dls,
+                                              ods=ods,
+                                              type_xml_file='All',
+                                              name='template_computation'
+                      )
 
     return workflow
 
