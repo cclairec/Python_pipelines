@@ -1,0 +1,1 @@
+install(PROGRAMS perform_dti_processing_drc_protocol.py DESTINATION python/niftypipe/bin)

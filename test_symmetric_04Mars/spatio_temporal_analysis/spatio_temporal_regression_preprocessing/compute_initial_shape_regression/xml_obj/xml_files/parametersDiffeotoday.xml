@@ -1,0 +1,21 @@
+<?xml version="1.0"?> 
+<sparse-diffeo-parameters> 
+<!-- Size of the kernel (default : 10.0) --> 
+<kernel-width>8</kernel-width> 
+<!-- Choice of the evaluation method of the kernel : exact, fgt, p3m (default : Exact) --> 
+<kernel-type>Exact</kernel-type> 
+<!-- Choice of the number of time points between 0 and 1 (default : 30) --> 
+<number-of-timepoints>10</number-of-timepoints> 
+<!-- ratio between the smoothing kernel width used in the gradient of template gradient and kernel width (default: 1.0)  --> 
+<smoothing-kernel-width-ratio>0.5</smoothing-kernel-width-ratio> 
+<!-- Step of the regular lattice of control points (default : kernel-width) --> 
+<initial-cp-spacing>5</initial-cp-spacing> 
+<!-- Enables to freeze the control points or not (default : Off) --> 
+<freeze-cp>Off</freeze-cp> 
+<!-- Maximum of descent iterations (default : 100) --> 
+<max-iterations>200</max-iterations> 
+<!-- Adaptive tolerance (default : 1e-04) --> 
+<adaptive-tolerance>5e-05</adaptive-tolerance> 
+<!-- Maximum number for the search of the optimal step on an iteration (default : 10) --> 
+<max-line-search-iterations>20</max-line-search-iterations> 
+<atlas-type>Bayesian</atlas-type></sparse-diffeo-parameters> 

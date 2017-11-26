@@ -1,0 +1,11 @@
+Next Release
+============
+
+* ENH: 
+
+Release 1.1.0 (15 December, 2015)
+============
+
+* API: The API now copies most of the one of nipype (https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyPipe/merge_requests/77)
+
+

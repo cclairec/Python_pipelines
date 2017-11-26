@@ -1,0 +1,357 @@
+[
+    {
+        "group": 1,
+        "imports": [],
+        "name": "00_swap_images",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "00_swap_images"
+        ],
+        "name": "01_merge_lists_images",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [],
+        "name": "02_xml_obj",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [],
+        "name": "03_age2onset_file_age",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [],
+        "name": "04_writeXmlParametersFiles",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "01_merge_lists_images"
+        ],
+        "name": "05_lin_reg",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "05_lin_reg"
+        ],
+        "name": "06_ave_ims",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "06_ave_ims",
+            "01_merge_lists_images"
+        ],
+        "name": "07_lin_reg",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "07_lin_reg",
+            "06_ave_ims"
+        ],
+        "name": "08_ave_ims",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "08_ave_ims",
+            "01_merge_lists_images"
+        ],
+        "name": "09_lin_reg",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [],
+        "name": "10_xml_obj",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "09_lin_reg"
+        ],
+        "name": "11_ave_ims",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "11_ave_ims"
+        ],
+        "name": "12_groupwise_renamer",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [],
+        "name": "13_swap_parcellations",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "13_swap_parcellations"
+        ],
+        "name": "14_merge_lists_parcellations",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "14_merge_lists_parcellations"
+        ],
+        "name": "15_extract_label",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "15_extract_label"
+        ],
+        "name": "16_erode_binaries",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "16_erode_binaries"
+        ],
+        "name": "17_dilate_binaries",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "11_ave_ims",
+            "09_lin_reg",
+            "17_dilate_binaries"
+        ],
+        "name": "18_apply_affine",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "18_apply_affine"
+        ],
+        "name": "19_extract_union_roi",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "19_extract_union_roi"
+        ],
+        "name": "20_binarise_roi",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "20_binarise_roi"
+        ],
+        "name": "21_dilate_roi",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "21_dilate_roi",
+            "01_merge_lists_images",
+            "09_lin_reg",
+            "11_ave_ims"
+        ],
+        "name": "22_apply_rigid_refinement",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "22_apply_rigid_refinement",
+            "11_ave_ims",
+            "17_dilate_binaries"
+        ],
+        "name": "23_final_resampling",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "23_final_resampling"
+        ],
+        "name": "24_extract_mesh",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "24_extract_mesh"
+        ],
+        "name": "25_reorder_meshes",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "25_reorder_meshes"
+        ],
+        "name": "26_init_template_extract",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "02_xml_obj",
+            "26_init_template_extract",
+            "25_reorder_meshes"
+        ],
+        "name": "27_atlas_mapnode",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "27_atlas_mapnode"
+        ],
+        "name": "28_renamer_meanShapes",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "28_renamer_meanShapes"
+        ],
+        "name": "29_extract_youngest_subjects",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "29_extract_youngest_subjects"
+        ],
+        "name": "30_init_template_extract",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "30_init_template_extract",
+            "29_extract_youngest_subjects",
+            "10_xml_obj"
+        ],
+        "name": "31_atlas_node",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "04_writeXmlParametersFiles",
+            "03_age2onset_file_age",
+            "31_atlas_node",
+            "28_renamer_meanShapes"
+        ],
+        "name": "32_computeSTregression",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "04_writeXmlParametersFiles",
+            "32_computeSTregression",
+            "31_atlas_node"
+        ],
+        "name": "33_shootingSTregression",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "33_shootingSTregression",
+            "04_writeXmlParametersFiles",
+            "03_age2onset_file_age"
+        ],
+        "name": "34_build_target_file_list4residual_comp",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "34_build_target_file_list4residual_comp",
+            "28_renamer_meanShapes",
+            "04_writeXmlParametersFiles"
+        ],
+        "name": "35_compute_residual_deformations",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "34_build_target_file_list4residual_comp",
+            "04_writeXmlParametersFiles",
+            "32_computeSTregression",
+            "35_compute_residual_deformations"
+        ],
+        "name": "36_parallel_transport_res_def",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "36_parallel_transport_res_def",
+            "34_build_target_file_list4residual_comp"
+        ],
+        "name": "37_renamer1",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "36_parallel_transport_res_def",
+            "34_build_target_file_list4residual_comp"
+        ],
+        "name": "38_renamer2",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "03_age2onset_file_age",
+            "31_atlas_node",
+            "28_renamer_meanShapes",
+            "04_writeXmlParametersFiles",
+            "32_computeSTregression",
+            "38_renamer2",
+            "24_extract_mesh",
+            "37_renamer1"
+        ],
+        "name": "39_data_sink",
+        "size": 1
+    },
+    {
+        "group": 2,
+        "imports": [],
+        "name": "40_arrange_subjects",
+        "size": 1
+    },
+    {
+        "group": 3,
+        "imports": [],
+        "name": "41_arrange_ages",
+        "size": 1
+    }
+]

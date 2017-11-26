@@ -1,0 +1,9 @@
+nipype>=0.12.1
+matplotlib>=1.4.3
+dipy>=0.7.1
+
+[doc]
+Sphinx>=0.3
+
+[test]
+nose>=0.10.1

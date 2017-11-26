@@ -1,0 +1,18 @@
+#-----------------------------------------------------------------------------
+#
+# NiftyPipeConfig.cmake - NiftyPipe CMake configuration file for external projects.
+#
+# This file is configured by NiftyPipe and used by the UseNiftyPipe.cmake module
+# to load NiftyPipe's settings for an external project.
+
+# The NiftyPipe source tree.
+SET(NiftyPipe_SOURCE_DIR "@NiftyPipe_SOURCE_DIR@")
+
+# The NiftyPipe version number
+SET(NiftyPipe_VERSION_MAJOR "@NiftyPipe_VERSION_MAJOR@")
+SET(NiftyPipe_VERSION_MINOR "@NiftyPipe_VERSION_MINOR@")
+SET(NiftyPipe_VERSION_BUILD "@NiftyPipe_VERSION_BUILD@")
+SET(NiftyPipe_VERSION "@NiftyPipe_VERSION@")
+
+# Some specific settings.
+SET(NiftyPipe_BUILD_TESTING "@BUILD_TESTING@")

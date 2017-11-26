@@ -1,0 +1,42 @@
+[
+    [
+        "age",
+        [
+            "0.0000000000",
+            "1.0000000000",
+            "1.0000000000",
+            "2.0000000000",
+            "2.0000000000",
+            "3.0000000000",
+            "3.0000000000",
+            "4.0000000000"
+        ]
+    ],
+    [
+        "bool_1persuj",
+        false
+    ],
+    [
+        "function_str",
+        "def write_age2onset_file(age, sub_id,\n                         bool_1persuj=False,\n                         file_name='AgeToOnsetNorm.txt'):\n    import os\n    file_name = os.path.abspath(file_name)\n    age_norm = [(float(i) - min(age))/(max(age)-min(age)) for i in age]\n    if bool_1persuj:\n        # loop on the subjects:\n        p, bn, ext = split_filename(file_name)\n        files_list = []\n        for k in range(len(sub_id)):\n            ge_file_b0 = p + bn + '_b0' + ext\n            files_list.append(ge_file_b0)\n            age_file = open(ge_file_b0, 'w')\n            age_file.write(str(sub_id[k]) + ' ' + str(age[k]) + ' ' + str(age_norm[k]) + '\\n')\n        del file_name\n        file_name = files_list\n    else:\n        age_file = open(file_name, 'w')\n        for k in range(len(sub_id)):\n            age_file.write(str(sub_id[k]) + ' ' + str(age[k]) + ' ' + str(age_norm[k]) + '\\n')\n\n    print file_name\n    return file_name\n"
+    ],
+    [
+        "sub_id",
+        [
+            "S1",
+            "S1",
+            "S2",
+            "S2",
+            "S3",
+            "S3",
+            "S4",
+            "S4"
+        ]
+    ],
+    [
+        "needed_outputs",
+        [
+            "file_name"
+        ]
+    ]
+]
