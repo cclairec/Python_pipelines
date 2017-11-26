@@ -495,7 +495,12 @@ def create_preprocessing_shape_analysis(labels,
 
     # Create the output node
     output_node = pe.Node(niu.IdentityInterface(
-        fields=['extracted_meshes']),
+        fields=['extracted_meshes',
+                'out_template_vtk_file',
+                'out_template_CP_file',
+                'out_template_MOM_file',
+                'out_template_vtk_files'
+                ]),
         name='output_node')
 
     # Create a sub-workflow for groupwise registration
@@ -530,7 +535,14 @@ def create_preprocessing_shape_analysis(labels,
                                               ods=ods,
                                               type_xml_file='All',
                                               name='template_computation'
-                      )
+                                            )
+
+    workflow.connect(meshes_workflow,'output_node.output_meshes', template_computation,'input_vtk_meshes')
+    workflow.connect(input_node,'subject_ids', template_computation,'subject_ids')
+    workflow.connect(template_computation, 'output_node.out_template_vtk_file', output_node, 'out_template_vtk_file')
+    workflow.connect(template_computation, 'output_node.out_template_CP_file', output_node, 'out_template_CP_file')
+    workflow.connect(template_computation, 'output_node.out_template_MOM_file', output_node, 'out_template_MOM_file')
+    workflow.connect(template_computation, 'output_node.out_template_vtk_files', output_node, 'out_template_vtk_files')
 
     return workflow
 

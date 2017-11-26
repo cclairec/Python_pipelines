@@ -100,6 +100,10 @@ def atlas_computation(map_node_use=False,  # True when input_vtk_meshes is a lis
         w.connect(xml_files, 'out_xmlObject', atlas_node, 'in_paramObjects')
 
         w.connect(atlas_node, 'out_file_vtk', output_node, 'out_template_vtk_file')
+        w.connect(atlas_node, 'out_file_CP', output_node, 'out_template_CP_file')
+        w.connect(atlas_node, 'out_file_MOM', output_node, 'out_template_MOM_file')
+        w.connect(atlas_node, 'out_files_vtk', output_node, 'out_template_vtk_files')
+
     return w
 
 
