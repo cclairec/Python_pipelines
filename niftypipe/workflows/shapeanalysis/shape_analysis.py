@@ -462,7 +462,7 @@ def create_spatio_temporal_analysis(labels,
     return workflow
 
 
-def create_preprocessing_shape_analysis(labels,
+def create_get_deformation_shape_analysis(labels,
                                               reduction_rate,
                                               rigid_iteration=1,
                                               affine_iteration=2,

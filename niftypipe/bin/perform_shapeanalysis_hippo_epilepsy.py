@@ -5,7 +5,7 @@ import os
 import sys
 import nipype.pipeline.engine as pe
 import nipype.interfaces.io as nio
-from niftypipe.workflows.shapeanalysis.shape_analysis import create_preprocessing_shape_analysis
+from niftypipe.workflows.shapeanalysis.shape_analysis import create_get_deformation_shape_analysis
 from niftypipe.interfaces.niftk.base import (generate_graph,
                                              run_workflow,
                                              default_parser_argument)
@@ -167,16 +167,12 @@ def main():
     #                   "len(args.subject_ids) = "+str(len(args.subject_ids)))
     print labels
     # Create the workflow
-    workflow = create_preprocessing_shape_analysis(labels=labels,
+    workflow = create_get_deformation_shape_analysis(labels=labels,
                                                reduction_rate=args.reduct_rate,
                                                scan_number=len(input_img))
     workflow.base_dir = result_dir
     workflow.inputs.input_node.input_images = input_img
     workflow.inputs.input_node.input_ref = input_img[0]
-    workflow.inputs.input_node.flip_id = args.flip_id
-    workflow.inputs.input_node.no_flip_id = args.no_flip_id
-    workflow.inputs.input_node.flip_seg =flip_seg
-    workflow.inputs.input_node.no_flip_seg = no_flip_seg
     workflow.inputs.input_node.subject_ids = args.subject_ids
     # workflow.inputs.input_node.ages = args.ages
     # workflow.inputs.input_node.xml_dkw = args.xml_dkw

@@ -91,6 +91,7 @@ def atlas_computation(map_node_use=False,  # True when input_vtk_meshes is a lis
                                         name='init_template_extract')
         init_template_extract.inputs.ind = 0
         w.connect(input_node, 'input_vtk_meshes', init_template_extract, 'in_list')
+
         # Compute the atlas of the subjects (in this case subjects are list of list, we then expect a list of atlas
         atlas_node = pe.Node(interface=SparseAtlas3(),
                                    name='atlas_node')
