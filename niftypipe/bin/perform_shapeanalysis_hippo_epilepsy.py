@@ -165,24 +165,23 @@ def main():
     # Create the workflow
     workflow = create_get_deformation_shape_analysis(labels=labels,
                                                reduction_rate=args.reduct_rate,
-                                               scan_number=len(input_img))
+                                               dkw=args.xml_dkw,
+                                              dkt=args.xml_dkt,
+                                              okw=args.xml_okw,
+                                              dtp=args.xml_dtp,
+                                              dsk=args.xml_dsk,
+                                              dcps=args.xml_dcps,
+                                              dcpp=args.xml_dcpp,
+                                              dfcp=args.xml_dfcp,
+                                              dmi=args.xml_dmi,
+                                              dat=args.xml_dat,
+                                              dls=args.xml_dls,
+                                              ods=args.xml_ods,
+                                              ot=args.xml_ot)
     workflow.base_dir = result_dir
     workflow.inputs.input_node.input_images = input_img
     workflow.inputs.input_node.input_ref = input_img[0]
     workflow.inputs.input_node.subject_ids = args.subject_ids
-    workflow.inputs.input_node.xml_dkw = args.xml_dkw
-    workflow.inputs.input_node.xml_dkt = args.xml_dkt
-    workflow.inputs.input_node.xml_dtp = args.xml_dtp
-    workflow.inputs.input_node.xml_dsk = args.xml_dsk
-    workflow.inputs.input_node.xml_dcps = args.xml_dcps
-    workflow.inputs.input_node.xml_dcpp = args.xml_dcpp
-    workflow.inputs.input_node.xml_dfcp = args.xml_dfcp
-    workflow.inputs.input_node.xml_dmi = args.xml_dmi
-    workflow.inputs.input_node.xml_dat = args.xml_dat
-    workflow.inputs.input_node.xml_dls = args.xml_dls
-    workflow.inputs.input_node.xml_ods = args.xml_ods
-    workflow.inputs.input_node.xml_okw = args.xml_okw
-    workflow.inputs.input_node.xml_ot = args.xml_ot
 
     # Edit the qsub arguments based on the input arguments
     qsubargs_time = '02:00:00'

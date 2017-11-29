@@ -478,6 +478,7 @@ def create_get_deformation_shape_analysis(labels,
                                               dat=0.00005,
                                               dls=20,
                                               ods=[0.5],
+                                              ot=["NonOrientedSurfaceMesh"],
                                               name='spatio_temporal_analysis'
                                               ):
     # Create the workflow
