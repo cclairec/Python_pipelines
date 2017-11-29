@@ -33,7 +33,10 @@ def atlas_computation(map_node_use=False,  # True when input_vtk_meshes is a lis
 
     # Create the output node
     output_node = pe.Node(niu.IdentityInterface(
-        fields=['out_template_vtk_file']),
+        fields=['out_template_vtk_file',
+                'out_template_CP_file',
+                'out_template_MOM_file',
+                'out_template_vtk_files']),
         name='output_node')
 
     w = pe.Workflow(name=name)
