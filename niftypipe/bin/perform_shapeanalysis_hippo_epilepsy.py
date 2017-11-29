@@ -199,6 +199,10 @@ def main():
 
     workflow.connect([
         (workflow.get_node('output_node'), ds, [('extracted_meshes', '@extracted_meshes')]),
+        (workflow.get_node('output_node'), ds, [('out_template_vtk_file', '@out_template_vtk_file')]),
+        (workflow.get_node('output_node'), ds, [('out_template_CP_file', '@out_template_CP_file')]),
+        (workflow.get_node('output_node'), ds, [('out_template_MOM_file', '@out_template_MOM_file')]),
+        (workflow.get_node('output_node'), ds, [('out_template_vtk_files', '@out_template_vtk_files')]),
     ])
 
     if args.graph is True:
