@@ -538,8 +538,8 @@ def create_get_deformation_shape_analysis(labels,
                                               name='template_computation'
                                             )
 
-    workflow.connect(meshes_workflow,'output_node.output_meshes', template_computation,'input_vtk_meshes')
-    workflow.connect(input_node,'subject_ids', template_computation,'subject_ids')
+    workflow.connect(meshes_workflow, 'output_node.output_meshes', template_computation, 'input_node.input_vtk_meshes')
+    workflow.connect(input_node, 'subject_ids', template_computation, 'input_node.subject_ids')
     workflow.connect(template_computation, 'output_node.out_template_vtk_file', output_node, 'out_template_vtk_file')
     workflow.connect(template_computation, 'output_node.out_template_CP_file', output_node, 'out_template_CP_file')
     workflow.connect(template_computation, 'output_node.out_template_MOM_file', output_node, 'out_template_MOM_file')
