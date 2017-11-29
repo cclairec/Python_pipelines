@@ -57,13 +57,13 @@ def main():
                         dest='reduct_rate',
                         metavar='number',
                         help='decimation rate for the mesh extraction method',
-                        default=0.1)
+                        default=0.05)
     parser.add_argument('-xml_dkw',
                         type=int,
                         dest='xml_dkw',
                         metavar='number',
                         help='Diffeo Kernel width',
-                        default=11)
+                        default=9)
     parser.add_argument('-xml_dkt',
                         dest='xml_dkt',
                         metavar='string',
@@ -74,7 +74,7 @@ def main():
                         dest='xml_dtp',
                         metavar='number',
                         help='Diffeo: number of time points',
-                        default=30)
+                        default=20)
     parser.add_argument('-xml_dsk',
                         type=float,
                         dest='xml_dsk',
@@ -124,14 +124,14 @@ def main():
                         dest='xml_ods',
                         metavar='number',
                         help='Object: weight of the object in the fidelity-to-data term',
-                        default=[0.5])
+                        default=[0.9])
     parser.add_argument('-xml_okw',
                         type=int,
                         nargs='+',
                         dest='xml_okw',
                         metavar='number',
                         help='Object: Kernel width',
-                        default=[5])
+                        default=[4])
     parser.add_argument('-xml_ot',
                         nargs='+',
                         dest='xml_ot',
@@ -154,17 +154,13 @@ def main():
     if not os.path.exists(result_dir):
         os.mkdir(result_dir)
     input_img = [os.path.abspath(f) for f in args.input_img]
-    flip_seg = [os.path.abspath(f) for f in args.flip_seg]
-    no_flip_seg = [os.path.abspath(f) for f in args.no_flip_seg]
-    print "nb segmentation to flip: " + str(len(args.flip_id))
-    print "nb segmentation to not flip: " + str(len(args.no_flip_id))
-    labels = [[args.input_lab[0]]] * (len(args.flip_id) + len(args.no_flip_id))
     # Not relevent when flipping the controls:
     # if len(args.flip_id)+len(args.no_flip_id)!=len(args.subject_ids):
     #     raise IOError("to be flipped ID and other ID should be the same size as the whole ID list. " \
     #                   "len(args.flip_id) = "+str(len(args.flip_id))+ " " \
     #                   "len(args.no_flip_id) = "+str(len(args.no_flip_id)) +" " \
     #                   "len(args.subject_ids) = "+str(len(args.subject_ids)))
+    labels=args.input_lab
     print labels
     # Create the workflow
     workflow = create_get_deformation_shape_analysis(labels=labels,
@@ -174,20 +170,19 @@ def main():
     workflow.inputs.input_node.input_images = input_img
     workflow.inputs.input_node.input_ref = input_img[0]
     workflow.inputs.input_node.subject_ids = args.subject_ids
-    # workflow.inputs.input_node.ages = args.ages
-    # workflow.inputs.input_node.xml_dkw = args.xml_dkw
-    # workflow.inputs.input_node.xml_dkt = args.xml_dkt
-    # workflow.inputs.input_node.xml_dtp = args.xml_dtp
-    # workflow.inputs.input_node.xml_dsk = args.xml_dsk
-    # workflow.inputs.input_node.xml_dcps = args.xml_dcps
-    # workflow.inputs.input_node.xml_dcpp = args.xml_dcpp
-    # workflow.inputs.input_node.xml_dfcp = args.xml_dfcp
-    # workflow.inputs.input_node.xml_dmi = args.xml_dmi
-    # workflow.inputs.input_node.xml_dat = args.xml_dat
-    # workflow.inputs.input_node.xml_dls = args.xml_dls
-    # workflow.inputs.input_node.xml_ods = args.xml_ods
-    # workflow.inputs.input_node.xml_okw = args.xml_okw
-    # workflow.inputs.input_node.xml_ot = args.xml_ot
+    workflow.inputs.input_node.xml_dkw = args.xml_dkw
+    workflow.inputs.input_node.xml_dkt = args.xml_dkt
+    workflow.inputs.input_node.xml_dtp = args.xml_dtp
+    workflow.inputs.input_node.xml_dsk = args.xml_dsk
+    workflow.inputs.input_node.xml_dcps = args.xml_dcps
+    workflow.inputs.input_node.xml_dcpp = args.xml_dcpp
+    workflow.inputs.input_node.xml_dfcp = args.xml_dfcp
+    workflow.inputs.input_node.xml_dmi = args.xml_dmi
+    workflow.inputs.input_node.xml_dat = args.xml_dat
+    workflow.inputs.input_node.xml_dls = args.xml_dls
+    workflow.inputs.input_node.xml_ods = args.xml_ods
+    workflow.inputs.input_node.xml_okw = args.xml_okw
+    workflow.inputs.input_node.xml_ot = args.xml_ot
 
     # Edit the qsub arguments based on the input arguments
     qsubargs_time = '02:00:00'
