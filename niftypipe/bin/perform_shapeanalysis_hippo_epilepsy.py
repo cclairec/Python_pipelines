@@ -180,6 +180,7 @@ def main():
                                               ot=args.xml_ot)
     workflow.base_dir = result_dir
     workflow.inputs.input_node.input_images = input_img
+    workflow.inputs.input_node.input_seg = args.seg
     workflow.inputs.input_node.input_ref = input_img[0]
     workflow.inputs.input_node.subject_ids = args.subject_ids
 
