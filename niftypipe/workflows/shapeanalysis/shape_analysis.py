@@ -514,12 +514,12 @@ def create_get_deformation_shape_analysis(labels,
     workflow.connect(input_node, 'input_ref', groupwise, 'input_node.ref_file')
 
     # Create the workflow to create the meshes in an average space
-    meshes_workflow = create_binary_to_meshes(label=labels, reduction_rate=reduction_rate)
-    workflow.connect(input_node, 'input_images', meshes_workflow, 'input_node.input_images')
-    workflow.connect(input_node, 'input_seg', meshes_workflow, 'input_node.input_parcellations')
-    workflow.connect(groupwise, 'output_node.trans_files', meshes_workflow, 'input_node.trans_files')
-    workflow.connect(groupwise, 'output_node.average_image', meshes_workflow, 'input_node.ref_file')
-    workflow.connect(meshes_workflow, 'output_node.output_meshes',
+    gw_binary_to_meshes = create_binary_to_meshes(label=labels, reduction_rate=reduction_rate)
+    workflow.connect(input_node, 'input_images', gw_binary_to_meshes, 'input_node.input_images')
+    workflow.connect(input_node, 'input_seg', gw_binary_to_meshes, 'input_node.input_parcellations')
+    workflow.connect(groupwise, 'output_node.trans_files', gw_binary_to_meshes, 'input_node.trans_files')
+    workflow.connect(groupwise, 'output_node.average_image', gw_binary_to_meshes, 'input_node.ref_file')
+    workflow.connect(gw_binary_to_meshes, 'output_node.output_meshes',
                      output_node, 'extracted_meshes')
 
     template_computation = atlas_computation(dkw=dkw,
@@ -538,7 +538,7 @@ def create_get_deformation_shape_analysis(labels,
                                               name='template_computation'
                                             )
 
-    workflow.connect(meshes_workflow, 'output_node.output_meshes', template_computation, 'input_node.input_vtk_meshes')
+    workflow.connect(gw_binary_to_meshes, 'output_node.output_meshes', template_computation, 'input_node.input_vtk_meshes')
     workflow.connect(input_node, 'subject_ids', template_computation, 'input_node.subject_ids')
     workflow.connect(template_computation, 'output_node.out_template_vtk_file', output_node, 'out_template_vtk_file')
     workflow.connect(template_computation, 'output_node.out_template_CP_file', output_node, 'out_template_CP_file')
