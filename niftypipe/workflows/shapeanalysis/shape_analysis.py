@@ -21,7 +21,8 @@ from ...interfaces.niftk.utils import MergeLabels, extractSubList
 
 def create_binary_to_meshes(label,
                             name='gw_binary_to_meshes',
-                            reduction_rate=0.3):
+                            reduction_rate=0.3,
+                            operand_value=0):
     # Create the workflow
     workflow = pe.Workflow(name=name)
     workflow.base_output_dir = name
@@ -48,12 +49,12 @@ def create_binary_to_meshes(label,
     workflow.connect(input_node, 'input_parcellations', extract_label, 'in_file')
 
     # Removing parasite segmentation: Erosion.
-    erode_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='ero', operand_value=2),
+    erode_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='ero', operand_value=operand_value),
                                 iterfield=['in_file'], name='erode_binaries')
     workflow.connect(extract_label, 'out_file', erode_binaries, 'in_file')
 
     # Removing parasite segmentation: Dilatation.
-    dilate_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='dil', operand_value=2),
+    dilate_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='dil', operand_value=operand_value),
                                  iterfield=['in_file'], name='dilate_binaries')
     workflow.connect(erode_binaries, 'out_file', dilate_binaries, 'in_file')
 
