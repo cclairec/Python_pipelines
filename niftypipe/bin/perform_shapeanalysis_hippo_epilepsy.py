@@ -63,7 +63,7 @@ def main():
                         dest='xml_dkw',
                         metavar='number',
                         help='Diffeo Kernel width',
-                        default=9)
+                        default=12)
     parser.add_argument('-xml_dkt',
                         dest='xml_dkt',
                         metavar='string',
@@ -74,7 +74,7 @@ def main():
                         dest='xml_dtp',
                         metavar='number',
                         help='Diffeo: number of time points',
-                        default=20)
+                        default=10)
     parser.add_argument('-xml_dsk',
                         type=float,
                         dest='xml_dsk',
@@ -86,7 +86,7 @@ def main():
                         dest='xml_dcps',
                         metavar='number',
                         help='Diffeos: Initial spacing for Control Points',
-                        default=5)
+                        default=12)
     parser.add_argument('-xml_dcpp',
                         dest='xml_dcpp',
                         metavar='number',
