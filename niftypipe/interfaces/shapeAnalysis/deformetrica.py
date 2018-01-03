@@ -188,7 +188,7 @@ class SparseAtlas3(DeformetricaCommand):
 
     def _list_outputs(self):
         outputs = self.output_spec().get()
-        outputs['out_file_MOM'] = os.path.abspath('Mom_final.txt')
+        outputs['out_file_MOM'] = os.path.abspath('MOM_final.txt')
         outputs['out_file_CP'] = os.path.abspath('CP_final.txt')
         init_templates = self.inputs.in_initTemplates
         list_outfile = []
