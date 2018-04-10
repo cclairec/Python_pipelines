@@ -138,6 +138,15 @@ def main():
                         metavar='number',
                         help='Object type',
                         default=["NonOrientedSurfaceMesh"])
+    parser.add_argument('-ref_trans',
+                        nargs='+',
+                        dest='trans_files',
+                        metavar='List of files',
+                        help='List of trans files obtained by a previous create_atlas wf: output_node.trans_files')
+    parser.add_argument('-ref_img',
+                        dest='average_image',
+                        metavar='image',
+                        help='average image obtained by a previous create_atlas wf: output_node.average_image')
 
     # Output directory
     parser.add_argument('-o', '--output_dir',
@@ -163,6 +172,17 @@ def main():
     #                   "len(args.subject_ids) = "+str(len(args.subject_ids)))
     labels=args.input_lab
     print labels
+
+    if hasattr(args,'trans_files'):
+        if hasattr(args,'average_image'):
+            atlas_image = 'present'
+        else:
+            raiseIOError("There is transfo files given, but no average image. You will need both or non of them.")
+    else:
+        if hasattr(args,'average_image'):
+            raiseIOError("There is an average image given, but no transfo files. You will need both or non of them.")
+        else:
+            atlas_image = 'none'
     # Create the workflow
     workflow = create_get_deformation_shape_analysis(labels=labels,
                                                reduction_rate=args.reduct_rate,
@@ -178,6 +198,7 @@ def main():
                                               dat=args.xml_dat,
                                               dls=args.xml_dls,
                                               ods=args.xml_ods,
+                                              atlas_image=atlas_image,
                                               ot=args.xml_ot)
     workflow.base_dir = result_dir
     workflow.inputs.input_node.input_images = input_img

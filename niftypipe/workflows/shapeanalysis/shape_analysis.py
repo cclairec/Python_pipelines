@@ -480,6 +480,7 @@ def create_get_deformation_shape_analysis(labels,
                                               dls=20,
                                               ods=[0.5],
                                               ot=["NonOrientedSurfaceMesh"],
+                                              atlas_image='none',
                                               name='shape_analysis'
                                               ):
     # Create the workflow
@@ -506,22 +507,32 @@ def create_get_deformation_shape_analysis(labels,
         name='output_node')
 
     # Create a sub-workflow for groupwise registration
-    groupwise = create_atlas(itr_rigid=rigid_iteration,
+    if atlas_image == 'none':
+        groupwise = create_atlas(itr_rigid=rigid_iteration,
                              itr_affine=affine_iteration,
                              itr_non_lin=0,
                              verbose=False,
                              name='groupwise')
-    workflow.connect(input_node, 'input_images', groupwise, 'input_node.in_files')
-    workflow.connect(input_node, 'input_ref', groupwise, 'input_node.ref_file')
+        workflow.connect(input_node, 'input_images', groupwise, 'input_node.in_files')
+        workflow.connect(input_node, 'input_ref', groupwise, 'input_node.ref_file')
 
-    # Create the workflow to create the meshes in an average space
-    gw_binary_to_meshes = create_binary_to_meshes(label=labels, reduction_rate=reduction_rate)
-    workflow.connect(input_node, 'input_images', gw_binary_to_meshes, 'input_node.input_images')
-    workflow.connect(input_node, 'input_seg', gw_binary_to_meshes, 'input_node.input_parcellations')
-    workflow.connect(groupwise, 'output_node.trans_files', gw_binary_to_meshes, 'input_node.trans_files')
-    workflow.connect(groupwise, 'output_node.average_image', gw_binary_to_meshes, 'input_node.ref_file')
-    workflow.connect(gw_binary_to_meshes, 'output_node.output_meshes',
-                     output_node, 'extracted_meshes')
+        # Create the workflow to create the meshes in an average space
+        gw_binary_to_meshes = create_binary_to_meshes(label=labels, reduction_rate=reduction_rate)
+        workflow.connect(input_node, 'input_images', gw_binary_to_meshes, 'input_node.input_images')
+        workflow.connect(input_node, 'input_seg', gw_binary_to_meshes, 'input_node.input_parcellations')
+        workflow.connect(groupwise, 'output_node.trans_files', gw_binary_to_meshes, 'input_node.trans_files')
+        workflow.connect(groupwise, 'output_node.average_image', gw_binary_to_meshes, 'input_node.ref_file')
+        workflow.connect(gw_binary_to_meshes, 'output_node.output_meshes',
+                         output_node, 'extracted_meshes')
+    else:
+        # Create the workflow to create the meshes in an average space
+        gw_binary_to_meshes = create_binary_to_meshes(label=labels, reduction_rate=reduction_rate)
+        workflow.connect(input_node, 'input_images', gw_binary_to_meshes, 'input_node.input_images')
+        workflow.connect(input_node, 'input_seg', gw_binary_to_meshes, 'input_node.input_parcellations')
+        workflow.connect(input_node, 'trans_files', gw_binary_to_meshes, 'input_node.trans_files')
+        workflow.connect(input_node, 'average_image', gw_binary_to_meshes, 'input_node.ref_file')
+        workflow.connect(gw_binary_to_meshes, 'output_node.output_meshes',
+                         output_node, 'extracted_meshes')
 
     template_computation = atlas_computation(dkw=dkw,
                                               dkt=dkt,
