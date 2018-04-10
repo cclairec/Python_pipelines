@@ -22,7 +22,7 @@ from ...interfaces.niftk.utils import MergeLabels, extractSubList
 def create_binary_to_meshes(label,
                             name='gw_binary_to_meshes',
                             reduction_rate=0.3,
-                            operand_value=0):
+                            operand_value=1):
     # Create the workflow
     workflow = pe.Workflow(name=name)
     workflow.base_output_dir = name

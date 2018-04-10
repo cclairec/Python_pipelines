@@ -1,5 +1,5 @@
 [commit hash]
 archive_subst_hash = $Format:%h$
-install_hash = ef6848f
+install_hash = 6fca87a
 	
 

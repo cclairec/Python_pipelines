@@ -8,6 +8,7 @@ from nipype.interfaces.utility import Function
 from nipype.workflows.smri.niftyreg.groupwise import create_groupwise_average as create_atlas
 
 from .centroid_computation import centroid_computation
+from .atlas_computation import atlas_computation
 from .shape_analysis import create_binary_to_meshes
 from niftypipe.interfaces.niftk.io import Image2VtkMesh
 from ...interfaces.niftk.utils import MergeLabels, extractSubList, SwapDimImage
@@ -186,33 +187,49 @@ def create_spatio_temporal_regression_preprocessing(
     workflow.connect(splitBaselineFollowup, 'b0_ages', extract_youngest_subjects_meshes, 'sorting_reference')
     workflow.connect(splitBaselineFollowup, 'b0_meshes', extract_youngest_subjects_meshes, 'in_list')
 
-    extract_youngest_subjID = pe.Node(interface=extractSubList(),
-                                      name='extract_youngest_subjID')
-    extract_youngest_subjID.inputs.k = k
-    workflow.connect(splitBaselineFollowup, 'b0_ages', extract_youngest_subjID, 'sorting_reference')
-    workflow.connect(splitBaselineFollowup, 'subject_ids_unique', extract_youngest_subjID, 'in_list')
+    # extract_youngest_subjID = pe.Node(interface=extractSubList(),
+    #                                   name='extract_youngest_subjID')
+    # extract_youngest_subjID.inputs.k = k
+    # workflow.connect(splitBaselineFollowup, 'b0_ages', extract_youngest_subjID, 'sorting_reference')
+    # workflow.connect(splitBaselineFollowup, 'subject_ids_unique', extract_youngest_subjID, 'in_list')
 
-    compute_initial_shape_regression = centroid_computation(k,
-                                                            label,
-                                                            False,
-                                                            param_gammaR=param_gammaR,
-                                                            param_sigmaV=param_sigmaV,
-                                                            param_sigmaW=param_sigmaW,
-                                                            param_maxiters=param_maxiters,
-                                                            param_T=param_T,
-                                                            param_ntries=param_ntries,
-                                                            param_MPeps=param_MPeps,
-                                                            name='compute_initial_shape_regression'
-                                                            )
-    workflow.connect(extract_youngest_subjects_meshes, 'sorted_list_ref', compute_initial_shape_regression, 'input_node.ages')
+    # compute_initial_shape_regression = centroid_computation(k,
+    #                                                         label,
+    #                                                         False,
+    #                                                         param_gammaR=param_gammaR,
+    #                                                         param_sigmaV=param_sigmaV,
+    #                                                         param_sigmaW=param_sigmaW,
+    #                                                         param_maxiters=param_maxiters,
+    #                                                         param_T=param_T,
+    #                                                         param_ntries=param_ntries,
+    #                                                         param_MPeps=param_MPeps,
+    #                                                         name='compute_initial_shape_regression'
+    #                                                         )
+    # workflow.connect(extract_youngest_subjects_meshes, 'sorted_list_ref', compute_initial_shape_regression, 'input_node.ages')
+    # workflow.connect(extract_youngest_subjects_meshes, 'out_sublist',
+    #                  compute_initial_shape_regression, 'input_node.input_vtk_meshes')
+    # workflow.connect(extract_youngest_subjID, 'out_sublist', compute_initial_shape_regression, 'input_node.subject_ids')
+    # workflow.connect(compute_initial_shape_regression, 'output_node.out_AgeToOnsetNorm_file',
+    #                  output_node, 'out_AgeToOnsetNorm_file')
+
+    # workflow.connect(compute_initial_shape_regression, 'output_node.out_centroid_vtk_file',
+    #                  output_node, 'centroid_b0_vtk_file')
+
+    compute_initial_shape_regression = atlas_computation(False,
+                                                         dkw=10,
+                                                         okw=[4],
+                                                         dmi=200,
+                                                         dtp=10,
+                                                         type_xml_file='All',
+                                                         name='compute_initial_shape_regression'
+                                                         )
     workflow.connect(extract_youngest_subjects_meshes, 'out_sublist',
                      compute_initial_shape_regression, 'input_node.input_vtk_meshes')
-    workflow.connect(extract_youngest_subjID, 'out_sublist', compute_initial_shape_regression, 'input_node.subject_ids')
-    workflow.connect(compute_initial_shape_regression, 'output_node.out_AgeToOnsetNorm_file',
-                     output_node, 'out_AgeToOnsetNorm_file')
+    workflow.connect(splitBaselineFollowup, 'subject_ids_unique', compute_initial_shape_regression, 'input_node.subject_ids')
 
-    workflow.connect(compute_initial_shape_regression, 'output_node.out_centroid_vtk_file',
+    workflow.connect(compute_initial_shape_regression, 'output_node.out_template_vtk_file',
                      output_node, 'centroid_b0_vtk_file')
+
     writeXmlParametersFiles = pe.Node(interface=WriteXMLFiles(),
                                       name='writeXmlParametersFiles')
     workflow.connect(input_node, 'xml_dkw', writeXmlParametersFiles, 'dkw')
@@ -718,8 +735,6 @@ def create_longitudinal_analysis_epilepsy(labels,
     workflow.connect(split_list_to_not_flip_seg, 'extracted_list', merge_lists_seg, 'in1')
     workflow.connect(swap_parcellations, 'flipped_image', merge_lists_seg, 'in2')
 
-
-
     # Create a sub-workflow for groupwise registration
     groupwise = create_atlas(itr_rigid=rigid_iteration,
                              itr_affine=affine_iteration,
@@ -754,18 +769,32 @@ def create_longitudinal_analysis_epilepsy(labels,
     workflow.connect(splitBaselineFollowup, 'indiv_age2onset_norm_file', output_node, 'indiv_ageNorm_files')
     workflow.connect(splitBaselineFollowup, 'b0_age2onset_norm_file', output_node, 'b0_ageNorm_file')
 
-    compute_common_baseline_shape = centroid_computation(labels,
-                                                            False,
-                                                            param_sigmaV=8,
-                                                            param_sigmaW=[10, 7, 4],
-                                                            param_maxiters=[100, 200, 200],
-                                                            param_T=10,
-                                                            name='compute_common_baseline_shape'
-                                                            )
-    workflow.connect(splitBaselineFollowup, 'b0_ages', compute_common_baseline_shape, 'input_node.ages')
+    # compute_common_baseline_shape = centroid_computation(labels,
+    #                                                         False,
+    #                                                         param_sigmaV=8,
+    #                                                         param_sigmaW=[10, 7, 4],
+    #                                                         param_maxiters=[100, 200, 200],
+    #                                                         param_T=10,
+    #                                                         name='compute_common_baseline_shape'
+    #                                                         )
+    # workflow.connect(splitBaselineFollowup, 'b0_ages', compute_common_baseline_shape, 'input_node.ages')
+    # workflow.connect(splitBaselineFollowup, 'b0_meshes',
+    #                  compute_common_baseline_shape, 'input_node.input_vtk_meshes')
+    # workflow.connect(splitBaselineFollowup, 'subject_ids_unique', compute_common_baseline_shape, 'input_node.subject_ids')
+
+    compute_common_baseline_shape = atlas_computation(False,
+                                                         dkw=8,
+                                                         okw=[4],
+                                                         dmi=200,
+                                                         dtp=10,
+                                                         type_xml_file='All',
+                                                         name='compute_common_baseline_shape'
+                                                         )
     workflow.connect(splitBaselineFollowup, 'b0_meshes',
                      compute_common_baseline_shape, 'input_node.input_vtk_meshes')
     workflow.connect(splitBaselineFollowup, 'subject_ids_unique', compute_common_baseline_shape, 'input_node.subject_ids')
+    workflow.connect(compute_common_baseline_shape, 'output_node.out_template_vtk_file',
+                     output_node, 'centroid_b0_vtk_file')
 
     writeXmlParametersFiles = pe.Node(interface=WriteXMLFiles(),
                                       name='writeXmlParametersFiles')
@@ -836,7 +865,7 @@ def create_longitudinal_analysis_epilepsy(labels,
     workflow.connect(writeXmlParametersFiles, 'out_xmlDiffeo', parallel_transport_to_indiv_traj, 'in_paramDiffeo') # need the new xml files
     workflow.connect(writeXmlParametersFiles, 'out_xmlObject', parallel_transport_to_indiv_traj, 'in_paramObjects')
     workflow.connect(compute_indiv_st_regression, 'out_file_MOM', parallel_transport_to_indiv_traj, 'in_vect')
-    workflow.connect(compute_common_baseline_shape, 'output_node.out_centroid_vtk_file',
+    workflow.connect(compute_common_baseline_shape, 'output_node.out_template_vtk_file',
                      parallel_transport_to_indiv_traj, 'in_vtk') # the reordered ones ?
 
     # Create a rename for the transported momentum

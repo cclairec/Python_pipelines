@@ -305,19 +305,6 @@ def create_spatio_temporal_regression_preprocessing(
                      compute_initial_shape_regression, 'input_node.input_vtk_meshes')
     workflow.connect(input_node, 'subject_ids_by_suj', compute_initial_shape_regression, 'input_node.subject_ids')
 
-
-    # # create the vtk file containing the Control Point positions, by decimating the baseline shape:
-    # # Not needed when using sparseAtlas, because the mean shape is already sparse.
-    # decimate_init_shape = pe.Node(interface=decimateVTKfile(in_reductionRate=0.85),
-    #                               name='decimate_init_shape')
-    # workflow.connect(compute_initial_shape_regression, 'output_node.out_template_vtk_file',
-    #                  decimate_init_shape, 'in_file')
-    #
-    # # Convert the vtk file of the CP points to the .txt file:
-    # convertVTK2txt_init_shape = pe.Node(interface=VTKPolyDataReader(),
-    #                                     name='convertVTK2txt_init_shape')
-    # workflow.connect(decimate_init_shape, 'out_file', convertVTK2txt_init_shape, 'in_filename')
-
     writeXmlParametersFiles = pe.Node(interface=WriteXMLFiles(),
                                       name='writeXmlParametersFiles')
     workflow.connect(input_node, 'xml_dkw', writeXmlParametersFiles, 'dkw')
@@ -504,7 +491,7 @@ def create_symmetric_spatio_temporal_analysis(labels,
 # linking the template to the time point 1 of each subject,
 # computing the individual trajectories,
 # transporting the individual evolution to the template.
-def create_preprocessing_shape_analysis_epilepsy(labels,
+def create_preprocessing_shape_analysis_epilepsy_flipping(labels,
                                               reduction_rate,
                                               rigid_iteration=1,
                                               affine_iteration=2,

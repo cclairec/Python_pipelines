@@ -26,6 +26,7 @@ niftypipe/bin/perform_noddi_processing.py
 niftypipe/bin/perform_regional_average.py
 niftypipe/bin/perform_restingstate_preprocessing.py
 niftypipe/bin/perform_shapeanalysis_hippo_epilepsy.py
+niftypipe/bin/perform_shapeanalysis_hippo_epilepsy_flipping.py
 niftypipe/bin/perform_shapeanalysis_longitudinal_epilepsy
 niftypipe/bin/perform_spatiotemporal_shape.py
 niftypipe/bin/perform_spatiotemporal_shape_longitudinal.py

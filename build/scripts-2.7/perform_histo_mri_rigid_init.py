@@ -1,4 +1,4 @@
-#!/opt/local/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python
+#!/home/claicury/Code/Install/niftypipe/bin/python
 
 import nipype.interfaces.utility as niu  # utility
 import nipype.interfaces.io as nio  # Input Output

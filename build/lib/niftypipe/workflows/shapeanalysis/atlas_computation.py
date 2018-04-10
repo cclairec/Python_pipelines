@@ -27,13 +27,16 @@ def atlas_computation(map_node_use=False,  # True when input_vtk_meshes is a lis
     input_node = pe.Node(niu.IdentityInterface(
         fields=['input_vtk_meshes',
                 'subject_ids',
-                'subject_ids_2'  # When subject_ids is a list of list, subject_ids_2 is a list of strings
+                'subject_ids_2'  # needed when computing several atlas (like Left/right mean shape), so when subject_ids is a list of list, subject_ids_2 is a list of strings
                 ]),
         name='input_node')
 
     # Create the output node
     output_node = pe.Node(niu.IdentityInterface(
-        fields=['out_template_vtk_file']),
+        fields=['out_template_vtk_file',
+                'out_template_CP_file',
+                'out_template_MOM_file',
+                'out_template_vtk_files']),
         name='output_node')
 
     w = pe.Workflow(name=name)
@@ -91,6 +94,7 @@ def atlas_computation(map_node_use=False,  # True when input_vtk_meshes is a lis
                                         name='init_template_extract')
         init_template_extract.inputs.ind = 0
         w.connect(input_node, 'input_vtk_meshes', init_template_extract, 'in_list')
+
         # Compute the atlas of the subjects (in this case subjects are list of list, we then expect a list of atlas
         atlas_node = pe.Node(interface=SparseAtlas3(),
                                    name='atlas_node')
@@ -100,6 +104,10 @@ def atlas_computation(map_node_use=False,  # True when input_vtk_meshes is a lis
         w.connect(xml_files, 'out_xmlObject', atlas_node, 'in_paramObjects')
 
         w.connect(atlas_node, 'out_file_vtk', output_node, 'out_template_vtk_file')
+        w.connect(atlas_node, 'out_file_CP', output_node, 'out_template_CP_file')
+        w.connect(atlas_node, 'out_file_MOM', output_node, 'out_template_MOM_file')
+        w.connect(atlas_node, 'out_files_vtk', output_node, 'out_template_vtk_files')
+
     return w
 
 

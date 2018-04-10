@@ -1,11 +1,11 @@
-#!/opt/local/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python
+#!/home/claicury/Code/Install/niftypipe/bin/python
 
 import argparse
 import os
 import sys
 import nipype.pipeline.engine as pe
 import nipype.interfaces.io as nio
-from niftypipe.workflows.shapeanalysis.shape_symmetrical_analysis import create_preprocessing_shape_analysis_epilepsy
+from niftypipe.workflows.shapeanalysis.shape_analysis import create_get_deformation_shape_analysis
 from niftypipe.interfaces.niftk.base import (generate_graph,
                                              run_workflow,
                                              default_parser_argument)
@@ -22,30 +22,15 @@ def main():
                         metavar='image',
                         nargs='+',
                         help='Input structural image(s)')
-    parser.add_argument('-fseg', '--flip_seg',
-                        dest='flip_seg',
+    parser.add_argument('-p', '--input_seg',
+                        dest='seg',
                         metavar='par',
-                        help='Input segmention image(s) for right side',
-                        nargs='+')
-    parser.add_argument('-nfseg', '--no_flip_seg',
-                        dest='no_flip_seg',
-                        metavar='par',
-                        help='Input segmention image(s) for left side',
+                        help='Input segmention image(s)',
                         nargs='+')
     parser.add_argument('-s', '--subject_ids',
                         dest='subject_ids',
                         metavar='list',
                         help='list of the subject Ids',
-                        nargs='+')
-    parser.add_argument('-fi', '--right_ep_id',
-                        dest='flip_id',
-                        metavar='list',
-                        help='list of the subject which have to be flipped',
-                        nargs='+')
-    parser.add_argument('-nfi', '--left_ep_id',
-                        dest='no_flip_id',
-                        metavar='list',
-                        help='list of the subject which doent need to be flipped',
                         nargs='+')
 
     # Other inputs
@@ -72,13 +57,13 @@ def main():
                         dest='reduct_rate',
                         metavar='number',
                         help='decimation rate for the mesh extraction method',
-                        default=0.1)
+                        default=0.05)
     parser.add_argument('-xml_dkw',
                         type=int,
                         dest='xml_dkw',
                         metavar='number',
                         help='Diffeo Kernel width',
-                        default=11)
+                        default=12)
     parser.add_argument('-xml_dkt',
                         dest='xml_dkt',
                         metavar='string',
@@ -89,7 +74,7 @@ def main():
                         dest='xml_dtp',
                         metavar='number',
                         help='Diffeo: number of time points',
-                        default=30)
+                        default=10)
     parser.add_argument('-xml_dsk',
                         type=float,
                         dest='xml_dsk',
@@ -101,7 +86,7 @@ def main():
                         dest='xml_dcps',
                         metavar='number',
                         help='Diffeos: Initial spacing for Control Points',
-                        default=5)
+                        default=12)
     parser.add_argument('-xml_dcpp',
                         dest='xml_dcpp',
                         metavar='number',
@@ -139,14 +124,14 @@ def main():
                         dest='xml_ods',
                         metavar='number',
                         help='Object: weight of the object in the fidelity-to-data term',
-                        default=[0.5])
+                        default=[0.9])
     parser.add_argument('-xml_okw',
                         type=int,
                         nargs='+',
                         dest='xml_okw',
                         metavar='number',
                         help='Object: Kernel width',
-                        default=[5])
+                        default=[4])
     parser.add_argument('-xml_ot',
                         nargs='+',
                         dest='xml_ot',
@@ -169,44 +154,36 @@ def main():
     if not os.path.exists(result_dir):
         os.mkdir(result_dir)
     input_img = [os.path.abspath(f) for f in args.input_img]
-    flip_seg = [os.path.abspath(f) for f in args.flip_seg]
-    no_flip_seg = [os.path.abspath(f) for f in args.no_flip_seg]
-    print "nb segmentation to flip: " + str(len(args.flip_id))
-    print "nb segmentation to not flip: " + str(len(args.no_flip_id))
-    labels = [[args.input_lab[0]]] * (len(args.flip_id) + len(args.no_flip_id))
+    input_seg = [os.path.abspath(f) for f in args.seg]
     # Not relevent when flipping the controls:
     # if len(args.flip_id)+len(args.no_flip_id)!=len(args.subject_ids):
     #     raise IOError("to be flipped ID and other ID should be the same size as the whole ID list. " \
     #                   "len(args.flip_id) = "+str(len(args.flip_id))+ " " \
     #                   "len(args.no_flip_id) = "+str(len(args.no_flip_id)) +" " \
     #                   "len(args.subject_ids) = "+str(len(args.subject_ids)))
+    labels=args.input_lab
     print labels
     # Create the workflow
-    workflow = create_preprocessing_shape_analysis_epilepsy(labels=labels,
+    workflow = create_get_deformation_shape_analysis(labels=labels,
                                                reduction_rate=args.reduct_rate,
-                                               scan_number=len(input_img))
+                                               dkw=args.xml_dkw,
+                                              dkt=args.xml_dkt,
+                                              okw=args.xml_okw,
+                                              dtp=args.xml_dtp,
+                                              dsk=args.xml_dsk,
+                                              dcps=args.xml_dcps,
+                                              dcpp=args.xml_dcpp,
+                                              dfcp=args.xml_dfcp,
+                                              dmi=args.xml_dmi,
+                                              dat=args.xml_dat,
+                                              dls=args.xml_dls,
+                                              ods=args.xml_ods,
+                                              ot=args.xml_ot)
     workflow.base_dir = result_dir
     workflow.inputs.input_node.input_images = input_img
+    workflow.inputs.input_node.input_seg = input_seg
     workflow.inputs.input_node.input_ref = input_img[0]
-    workflow.inputs.input_node.flip_id = args.flip_id
-    workflow.inputs.input_node.no_flip_id = args.no_flip_id
-    workflow.inputs.input_node.flip_seg =flip_seg
-    workflow.inputs.input_node.no_flip_seg = no_flip_seg
     workflow.inputs.input_node.subject_ids = args.subject_ids
-    # workflow.inputs.input_node.ages = args.ages
-    # workflow.inputs.input_node.xml_dkw = args.xml_dkw
-    # workflow.inputs.input_node.xml_dkt = args.xml_dkt
-    # workflow.inputs.input_node.xml_dtp = args.xml_dtp
-    # workflow.inputs.input_node.xml_dsk = args.xml_dsk
-    # workflow.inputs.input_node.xml_dcps = args.xml_dcps
-    # workflow.inputs.input_node.xml_dcpp = args.xml_dcpp
-    # workflow.inputs.input_node.xml_dfcp = args.xml_dfcp
-    # workflow.inputs.input_node.xml_dmi = args.xml_dmi
-    # workflow.inputs.input_node.xml_dat = args.xml_dat
-    # workflow.inputs.input_node.xml_dls = args.xml_dls
-    # workflow.inputs.input_node.xml_ods = args.xml_ods
-    # workflow.inputs.input_node.xml_okw = args.xml_okw
-    # workflow.inputs.input_node.xml_ot = args.xml_ot
 
     # Edit the qsub arguments based on the input arguments
     qsubargs_time = '02:00:00'
@@ -224,6 +201,10 @@ def main():
 
     workflow.connect([
         (workflow.get_node('output_node'), ds, [('extracted_meshes', '@extracted_meshes')]),
+        (workflow.get_node('output_node'), ds, [('out_template_vtk_file', '@out_template_vtk_file')]),
+        (workflow.get_node('output_node'), ds, [('out_template_CP_file', '@out_template_CP_file')]),
+        (workflow.get_node('output_node'), ds, [('out_template_MOM_file', '@out_template_MOM_file')]),
+        (workflow.get_node('output_node'), ds, [('out_template_vtk_files', '@out_template_vtk_files')]),
     ])
 
     if args.graph is True:

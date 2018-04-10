@@ -9,6 +9,7 @@ import nipype.interfaces.niftyseg as niftyseg
 from nipype.workflows.smri.niftyreg.groupwise import create_groupwise_average as create_atlas
 
 from .centroid_computation import centroid_computation
+from .atlas_computation import atlas_computation
 
 from ...interfaces.niftk.io import Image2VtkMesh
 from ...interfaces.shapeAnalysis import (VTKPolyDataReader, decimateVTKfile, CreateStructureOfData, WriteXMLFiles,
@@ -20,7 +21,8 @@ from ...interfaces.niftk.utils import MergeLabels, extractSubList
 
 def create_binary_to_meshes(label,
                             name='gw_binary_to_meshes',
-                            reduction_rate=0.3):
+                            reduction_rate=0.3,
+                            operand_value=1):
     # Create the workflow
     workflow = pe.Workflow(name=name)
     workflow.base_output_dir = name
@@ -41,18 +43,18 @@ def create_binary_to_meshes(label,
 
     # Extract the relevant label from the GIF parcellation
     extract_label = pe.MapNode(interface=MergeLabels(),
-                               iterfield=['in_file', 'roi_list'],
+                               iterfield=['in_file'],
                                name='extract_label')
     extract_label.inputs.roi_list = label
     workflow.connect(input_node, 'input_parcellations', extract_label, 'in_file')
 
     # Removing parasite segmentation: Erosion.
-    erode_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='ero', operand_value=2),
+    erode_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='ero', operand_value=operand_value),
                                 iterfield=['in_file'], name='erode_binaries')
     workflow.connect(extract_label, 'out_file', erode_binaries, 'in_file')
 
     # Removing parasite segmentation: Dilatation.
-    dilate_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='dil', operand_value=2),
+    dilate_binaries = pe.MapNode(interface=niftyseg.BinaryMathsInteger(operation='dil', operand_value=operand_value),
                                  iterfield=['in_file'], name='dilate_binaries')
     workflow.connect(erode_binaries, 'out_file', dilate_binaries, 'in_file')
 
@@ -76,7 +78,7 @@ def create_binary_to_meshes(label,
     workflow.connect(extract_union_roi, 'out_file', binarise_roi, 'in_file')
 
     # Dilation of the binarise union ROI
-    dilate_roi = pe.Node(interface=niftyseg.BinaryMathsInteger(operation='dil', operand_value=6),
+    dilate_roi = pe.Node(interface=niftyseg.BinaryMathsInteger(operation='dil', operand_value=4),
                          name='dilate_roi')
     workflow.connect(binarise_roi, 'out_file', dilate_roi, 'in_file')
 
@@ -459,3 +461,91 @@ def create_spatio_temporal_analysis(labels,
     workflow.connect(computation_regression, 'output_node.out_file_MOM',
                      output_node, 'out_file_MOM')
     return workflow
+
+
+def create_get_deformation_shape_analysis(labels,
+                                              reduction_rate,
+                                              rigid_iteration=1,
+                                              affine_iteration=2,
+                                              dkw=10,
+                                              dkt='Exact',
+                                              okw=[8],
+                                              dtp=30,
+                                              dsk=0.5,
+                                              dcps=5,
+                                              dcpp='x',
+                                              dfcp='Off',
+                                              dmi=200,
+                                              dat=0.00005,
+                                              dls=20,
+                                              ods=[0.5],
+                                              ot=["NonOrientedSurfaceMesh"],
+                                              name='shape_analysis'
+                                              ):
+    # Create the workflow
+    workflow = pe.Workflow(name=name)
+    workflow.base_output_dir = name
+
+    # Create the input input node
+    input_node = pe.Node(niu.IdentityInterface(
+        fields=['input_images',
+                'input_ref',
+                'input_seg',
+                'subject_ids'
+                ]),
+        name='input_node')
+
+    # Create the output node
+    output_node = pe.Node(niu.IdentityInterface(
+        fields=['extracted_meshes',
+                'out_template_vtk_file',
+                'out_template_CP_file',
+                'out_template_MOM_file',
+                'out_template_vtk_files'
+                ]),
+        name='output_node')
+
+    # Create a sub-workflow for groupwise registration
+    groupwise = create_atlas(itr_rigid=rigid_iteration,
+                             itr_affine=affine_iteration,
+                             itr_non_lin=0,
+                             verbose=False,
+                             name='groupwise')
+    workflow.connect(input_node, 'input_images', groupwise, 'input_node.in_files')
+    workflow.connect(input_node, 'input_ref', groupwise, 'input_node.ref_file')
+
+    # Create the workflow to create the meshes in an average space
+    gw_binary_to_meshes = create_binary_to_meshes(label=labels, reduction_rate=reduction_rate)
+    workflow.connect(input_node, 'input_images', gw_binary_to_meshes, 'input_node.input_images')
+    workflow.connect(input_node, 'input_seg', gw_binary_to_meshes, 'input_node.input_parcellations')
+    workflow.connect(groupwise, 'output_node.trans_files', gw_binary_to_meshes, 'input_node.trans_files')
+    workflow.connect(groupwise, 'output_node.average_image', gw_binary_to_meshes, 'input_node.ref_file')
+    workflow.connect(gw_binary_to_meshes, 'output_node.output_meshes',
+                     output_node, 'extracted_meshes')
+
+    template_computation = atlas_computation(dkw=dkw,
+                                              dkt=dkt,
+                                              okw=okw,
+                                              dtp=dtp,
+                                              dsk=dsk,
+                                              dcps=dcps,
+                                              dcpp=dcpp,
+                                              dfcp=dfcp,
+                                              dmi=dmi,
+                                              dat=dat,
+                                              dls=dls,
+                                              ods=ods,
+                                              type_xml_file='All',
+                                              name='template_computation'
+                                            )
+
+    workflow.connect(gw_binary_to_meshes, 'output_node.output_meshes', template_computation, 'input_node.input_vtk_meshes')
+    workflow.connect(input_node, 'subject_ids', template_computation, 'input_node.subject_ids')
+    workflow.connect(template_computation, 'output_node.out_template_vtk_file', output_node, 'out_template_vtk_file')
+    workflow.connect(template_computation, 'output_node.out_template_CP_file', output_node, 'out_template_CP_file')
+    workflow.connect(template_computation, 'output_node.out_template_MOM_file', output_node, 'out_template_MOM_file')
+    workflow.connect(template_computation, 'output_node.out_template_vtk_files', output_node, 'out_template_vtk_files')
+
+    return workflow
+
+
