@@ -177,10 +177,10 @@ def main():
         if hasattr(args,'average_image'):
             atlas_image = 'present'
         else:
-            raiseIOError("There is transfo files given, but no average image. You will need both or non of them.")
+            raise IOError("There is transfo files given, but no average image. You will need both or non of them.")
     else:
         if hasattr(args,'average_image'):
-            raiseIOError("There is an average image given, but no transfo files. You will need both or non of them.")
+            raise IOError("There is an average image given, but no transfo files. You will need both or non of them.")
         else:
             atlas_image = 'none'
     # Create the workflow
